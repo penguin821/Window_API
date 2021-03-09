@@ -350,7 +350,7 @@ int main()
 						for (int j = 0; j < 5; j++)
 						{
 							if (c_selected[i][j] % 2 == 1)
-								c_selected[i][j] = 0;
+								c_selected[i][j] = '0';
 						}
 					}
 					cout << endl;
@@ -361,7 +361,7 @@ int main()
 						for (int j = 0; j < 5; j++)
 						{
 							if (c_selected[i][j] % 2 == 0)
-								c_selected[i][j] = 0;
+								c_selected[i][j] = '0';
 						}
 					}
 					cout << endl;
