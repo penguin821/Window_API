@@ -4,22 +4,22 @@ using namespace std;
 
 constexpr int MAX_SIZE = 14;
 
-int multiplication(int a, int b)
+float multiplication(float a, float b)
 {
 	return a * b;
 }
 
-int addition(int a, int b)
+float addition(float a, float b)
 {
 	return a + b;
 }
 
-int subtraction(int a, int b)
+float subtraction(float a, float b)
 {
 	return a - b;
 }
 
-int division(int a, int b)
+float division(float a, float b)
 {
 	return a / b;
 }
@@ -74,12 +74,6 @@ void make_formula(int end, char formula[])
 				numbers[j - 1] = numbers[j];
 				j--;
 			}
-			j = i;
-			while ('*' == signs[j + 1] || '/' == signs[j + 1])
-			{
-				numbers[j + 2] = numbers[j + 1];
-				j++;
-			}
 		}
 		if ('/' == signs[i])
 		{
@@ -91,12 +85,6 @@ void make_formula(int end, char formula[])
 			{
 				numbers[j - 1] = numbers[j];
 				j--;
-			}
-			j = i;
-			while ('*' == signs[j + 1] || '/' == signs[j + 1])
-			{
-				numbers[j + 2] = numbers[j + 1];
-				j++;
 			}
 		}
 	}

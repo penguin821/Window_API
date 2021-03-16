@@ -129,6 +129,30 @@ int main()
 			}
 			break;
 		case 4:
+			for (int i = 0; i < height; i++)
+			{
+				for (int j = 0; j <= i; j++)
+					cout << "*";
+				for (int x = 1; x < height - i; x++)
+					cout << " ";
+				for (int y = 1; y < height - i; y++)
+					cout << " ";
+				for (int z = 0; z <= i; z++)
+					cout << "*";
+				cout << "\n";
+			}
+			for (int i = 1; i < height; i++)
+			{
+				for (int j = 0; j < height - i; j++)
+					cout << "*";
+				for (int x = 1; x <= i; x++)
+					cout << " ";
+				for (int y = 1; y <= i; y++)
+					cout << " ";
+				for (int z = 0; z < height - i; z++)
+					cout << "*";
+				cout << "\n";
+			}
 			break;
 		case 5:
 			if (height % 2 == 1)
@@ -189,6 +213,27 @@ int main()
 			}
 			break;
 		case 6:
+			for (int i = 0; i < height; i++)
+			{
+				if (0 == i || height - 1 == i)
+				{
+					for (int j = 0; j < size; j++)
+					{
+						cout << "*";
+					}
+				}
+				else
+				{
+					for (int j = 0; j < size; j++)
+					{
+						if (0 == j || size - 1 == j)
+							cout << "*";
+						else
+							cout << " ";
+					}
+				}
+				cout << "\n";
+			}
 			break;
 		}
 	}
