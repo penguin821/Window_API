@@ -3,10 +3,18 @@
 #include <tchar.h>
 
 constexpr int WINDOW_WIDTH = 800;
-constexpr int WINDOW_HEIGHT = 600;
+constexpr int WINDOW_HEIGHT = 800;
 
-constexpr int DIVIDE_WIDTH = 3;
-constexpr int DIVIDE_HEIGHT = 2;
+constexpr int DIVIDE_WIDTH = 15;
+constexpr int DIVIDE_HEIGHT = 15;
+constexpr int DIVIDE_MAX = 15;
+
+constexpr short EMPTY = 0;
+constexpr short BLOCK = 1;
+constexpr short COLOR = 2;
+constexpr short SIZECHANGE = 3;
+constexpr short PLAYER1 = 4;
+constexpr short PLAYER2 = 5;
 
 HINSTANCE g_hInst;
 LPCTSTR lpszClass = L"Window1";
@@ -53,96 +61,547 @@ LRESULT CALLBACK WndProc1(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	PAINTSTRUCT ps;
 	HDC hdc;
 	RECT C;
-	HBRUSH hTriBrush, hSandBrush, hPentaBrush, hPieBrush, oldBrush;
-	static int t_r, t_g, t_b, s_r, s_g, s_b, pe_r, pe_g, pe_b, pi_r, pi_g, pi_b,
-		t_tr, t_tg, t_tb, t_sr, t_sg, t_sb, t_per, t_peg, t_peb, t_pir, t_pig, t_pib;
-	static bool select_t = false, select_s = false, select_pe = false, select_pi = false;
+	HBRUSH hBrush, oldBrush;
+	static short num_red, num_other, num_size, count_red, count_other, count_size;
+	static short p1_x, p1_y, p2_x, p2_y;
+	static short p1_r, p1_g, p1_b, p2_r, p2_g, p2_b;
+	static short board[DIVIDE_WIDTH][DIVIDE_HEIGHT];
+	static bool is_p1_turn, p1_shape, p2_shape;
+	short temp_p1[1][1], temp_p2[1][1];
 	switch (uMsg)
 	{
 	case WM_CREATE:
 	{
+		for (int i = 0; i < DIVIDE_HEIGHT; ++i)
+		{
+			for (int j = 0; j < DIVIDE_WIDTH; ++j)
+			{
+				board[i][j] = EMPTY;
+			}
+		}
+		p1_x = 0;
+		p1_y = 0;
+		p2_x = DIVIDE_WIDTH - 1;
+		p2_y = DIVIDE_HEIGHT - 1;
+		p2_g = 150;
+		p2_b = 150;
+		is_p1_turn = true;
+		p1_shape = false;
+		p2_shape = false;
+		board[p1_x][p1_y] = PLAYER1;
+		board[p2_x][p2_y] = PLAYER2;
+		count_red = 0;
+		count_other = 0;
+		count_size = 0;
+		while (true)
+		{
+			num_red = rand() % 10 + 1;
+			num_other = rand() % 10 + 1;
+			num_size = rand() % 10 + 1;
+
+			if (20 <= num_red + num_other + num_size)
+			{
+				while (true)
+				{
+					int board_x = rand() % DIVIDE_WIDTH;
+					int board_y = rand() % DIVIDE_HEIGHT;
+
+					if (EMPTY == board[board_x][board_y])
+					{
+						board[board_x][board_y] = rand() % 3 + 1;
+
+						if (BLOCK == board[board_x][board_y])
+						{
+							if (num_red != count_red)
+								count_red++;
+							else
+								board[board_x][board_y] = 0;
+						}
+						else if (COLOR == board[board_x][board_y])
+						{
+							if (num_other != count_other)
+								count_other++;
+							else
+								board[board_x][board_y] = 0;
+						}
+						else if (SIZECHANGE == board[board_x][board_y])
+						{
+							if (num_size != count_size)
+								count_size++;
+							else
+								board[board_x][board_y] = 0;
+						}
+
+						if (num_red == count_red && num_other == count_other && num_size == count_size)
+							break;
+					}
+					else
+						continue;
+				}
+			}
+			else
+				continue;
+			break;
+		}
 	}
 	break;
 	case WM_KEYDOWN:
 	{
 		switch (wParam)
 		{
-		case 'T':
-		case 't':
-			t_r = rand() % 256;
-			t_g = rand() % 256;
-			t_b = rand() % 256;
-			t_tr = t_r;
-			t_tg = t_g;
-			t_tb = t_b;
+		case 'W':
+		case 'w':
+			if (true == is_p1_turn)
+			{
+				is_p1_turn = false;
+				if (0 == p1_y)
+				{
+					if (EMPTY == board[p1_x][DIVIDE_MAX - 1])
+						p1_y = DIVIDE_MAX - 1;
+					else if (COLOR == board[p1_x][DIVIDE_MAX - 1])
+					{
+						p1_r = rand() % 256;
+						p1_g = rand() % 256;
+						p1_b = rand() % 256;
+						p1_y = DIVIDE_MAX - 1;
+					}
+					else if (SIZECHANGE == board[p1_x][DIVIDE_MAX - 1])
+					{
+						if (false == p1_shape)
+							p1_shape = true;
+						else
+							p1_shape = false;
+						p1_y = DIVIDE_MAX - 1;
+					}
+				}
+				else
+				{
+					if (EMPTY == board[p1_x][p1_y - 1])
+						--p1_y;
+					else if (COLOR == board[p1_x][p1_y - 1])
+					{
+						p1_r = rand() % 256;
+						p1_g = rand() % 256;
+						p1_b = rand() % 256;
+						--p1_y;
+					}
+					else if (SIZECHANGE == board[p1_x][p1_y - 1])
+					{
+						if (false == p1_shape)
+							p1_shape = true;
+						else
+							p1_shape = false;
+						--p1_y;
+					}
+				}
+			}
 			break;
 		case 'S':
 		case 's':
-			s_r = rand() % 256;
-			s_g = rand() % 256;
-			s_b = rand() % 256;
-			t_sr = s_r;
-			t_sg = s_g;
-			t_sb = s_b;
+			if (true == is_p1_turn)
+			{
+				is_p1_turn = false;
+				if (DIVIDE_MAX - 1 == p1_y)
+				{
+					if (EMPTY == board[p1_x][0])
+						p1_y = 0;
+					else if (COLOR == board[p1_x][0])
+					{
+						p1_r = rand() % 256;
+						p1_g = rand() % 256;
+						p1_b = rand() % 256;
+						p1_y = 0;
+					}
+					else if (SIZECHANGE == board[p1_x][0])
+					{
+						if (false == p1_shape)
+							p1_shape = true;
+						else
+							p1_shape = false;
+						p1_y = 0;
+					}
+				}
+				else
+				{
+					if (EMPTY == board[p1_x][p1_y + 1])
+						++p1_y;
+					else if (COLOR == board[p1_x][p1_y + 1])
+					{
+						p1_r = rand() % 256;
+						p1_g = rand() % 256;
+						p1_b = rand() % 256;
+						++p1_y;
+					}
+					else if (SIZECHANGE == board[p1_x][p1_y + 1])
+					{
+						if (false == p1_shape)
+							p1_shape = true;
+						else
+							p1_shape = false;
+						++p1_y;
+					}
+				}
+			}
 			break;
-		case 'P':
-		case 'p':
-			pe_r = rand() % 256;
-			pe_g = rand() % 256;
-			pe_b = rand() % 256;
-			t_per = pe_r;
-			t_peg = pe_g;
-			t_peb = pe_b;
+		case 'A':
+		case 'a':
+			if (true == is_p1_turn)
+			{
+				is_p1_turn = false;
+				if (0 == p1_x)
+				{
+					if (EMPTY == board[DIVIDE_MAX - 1][p1_y])
+						p1_x = DIVIDE_MAX - 1;
+					else if (COLOR == board[DIVIDE_MAX - 1][p1_y])
+					{
+						p1_r = rand() % 256;
+						p1_g = rand() % 256;
+						p1_b = rand() % 256;
+						p1_x = DIVIDE_MAX - 1;
+					}
+					else if (SIZECHANGE == board[DIVIDE_MAX - 1][p1_y])
+					{
+						if (false == p1_shape)
+							p1_shape = true;
+						else
+							p1_shape = false;
+						p1_x = DIVIDE_MAX - 1;
+					}
+				}
+				else
+				{
+					if (EMPTY == board[p1_x - 1][p1_y])
+						--p1_x;
+					else if (COLOR == board[p1_x - 1][p1_y])
+					{
+						p1_r = rand() % 256;
+						p1_g = rand() % 256;
+						p1_b = rand() % 256;
+						--p1_x;
+					}
+					else if (SIZECHANGE == board[p1_x - 1][p1_y])
+					{
+						if (false == p1_shape)
+							p1_shape = true;
+						else
+							p1_shape = false;
+						--p1_x;
+					}
+				}
+			}
 			break;
-		case 'E':
-		case 'e':
-			pi_r = rand() % 256;
-			pi_g = rand() % 256;
-			pi_b = rand() % 256;
-			t_pir = pi_r;
-			t_pig = pi_g;
-			t_pib = pi_b;
+		case 'D':
+		case 'd':
+			if (true == is_p1_turn)
+			{
+				is_p1_turn = false;
+				if (DIVIDE_MAX - 1 == p1_x)
+				{
+					if (EMPTY == board[0][p1_y])
+						p1_x = 0;
+					else if (COLOR == board[0][p1_y])
+					{
+						p1_r = rand() % 256;
+						p1_g = rand() % 256;
+						p1_b = rand() % 256;
+						p1_x = 0;
+					}
+					else if (SIZECHANGE == board[0][p1_y])
+					{
+						if (false == p1_shape)
+							p1_shape = true;
+						else
+							p1_shape = false;
+						p1_x = 0;
+					}
+				}
+				else
+				{
+					if (EMPTY == board[p1_x + 1][p1_y])
+						++p1_x;
+					else if (COLOR == board[p1_x + 1][p1_y])
+					{
+						p1_r = rand() % 256;
+						p1_g = rand() % 256;
+						p1_b = rand() % 256;
+						++p1_x;
+					}
+					else if (SIZECHANGE == board[p1_x + 1][p1_y])
+					{
+						if (false == p1_shape)
+							p1_shape = true;
+						else
+							p1_shape = false;
+						++p1_x;
+					}
+				}
+			}
 			break;
 		case 'Q':
 		case 'q':
 			PostQuitMessage(0);
 			break;
 		case VK_UP:
-			if (t_sr == s_r && t_sg == s_g && t_sb == s_b)
+			if (false == is_p1_turn)
 			{
-				s_r = rand() % 256;
-				s_g = rand() % 256;
-				s_b = rand() % 256;
+				is_p1_turn = true;
+				if (0 == p2_y)
+				{
+					if (EMPTY == board[p2_x][DIVIDE_MAX - 1])
+						p2_y = DIVIDE_MAX - 1;
+					else if (COLOR == board[p2_x][DIVIDE_MAX - 1])
+					{
+						p2_r = rand() % 256;
+						p2_g = rand() % 256;
+						p2_b = rand() % 256;
+						p2_y = DIVIDE_MAX - 1;
+					}
+					else if (SIZECHANGE == board[p2_x][DIVIDE_MAX - 1])
+					{
+						if (false == p1_shape)
+							p2_shape = true;
+						else
+							p2_shape = false;
+						p2_y = DIVIDE_MAX - 1;
+					}
+				}
+				else
+				{
+					if (EMPTY == board[p2_x][p2_y - 1])
+						--p2_y;
+					else if (COLOR == board[p2_x][p2_y - 1])
+					{
+						p2_r = rand() % 256;
+						p2_g = rand() % 256;
+						p2_b = rand() % 256;
+						--p2_y;
+					}
+					else if (SIZECHANGE == board[p2_x][p2_y - 1])
+					{
+						if (false == p2_shape)
+							p2_shape = true;
+						else
+							p2_shape = false;
+						--p2_y;
+					}
+				}
 			}
-			select_s = true;
-			break;
-		case VK_LEFT:
-			if (t_tr == t_r && t_tg == t_g && t_tb == t_b)
-			{
-				t_r = rand() % 256;
-				t_g = rand() % 256;
-				t_b = rand() % 256;
-			}
-			select_t = true;
-			break;
-		case VK_RIGHT:
-			if (t_per == pe_r && t_peg == pe_g && t_peb == pe_b)
-			{
-				pe_r = rand() % 256;
-				pe_g = rand() % 256;
-				pe_b = rand() % 256;
-			}
-			select_pe = true;
 			break;
 		case VK_DOWN:
-			if (t_pir == pi_r && t_pig == pi_g && t_pib == pi_b)
+			if (false == is_p1_turn)
 			{
-				pi_r = rand() % 256;
-				pi_g = rand() % 256;
-				pi_b = rand() % 256;
+				is_p1_turn = true;
+				if (DIVIDE_MAX - 1 == p2_y)
+				{
+					if (EMPTY == board[p2_x][0])
+						p2_y = 0;
+					else if (COLOR == board[p2_x][0])
+					{
+						p2_r = rand() % 256;
+						p2_g = rand() % 256;
+						p2_b = rand() % 256;
+						p2_y = 0;
+					}
+					else if (SIZECHANGE == board[p2_x][0])
+					{
+						if (false == p2_shape)
+							p2_shape = true;
+						else
+							p2_shape = false;
+						p2_y = 0;
+					}
+				}
+				else
+				{
+					if (EMPTY == board[p2_x][p2_y + 1])
+						++p2_y;
+					else if (COLOR == board[p2_x][p2_y + 1])
+					{
+						p2_r = rand() % 256;
+						p2_g = rand() % 256;
+						p2_b = rand() % 256;
+						++p2_y;
+					}
+					else if (SIZECHANGE == board[p2_x][p2_y + 1])
+					{
+						if (false == p2_shape)
+							p2_shape = true;
+						else
+							p2_shape = false;
+						++p2_y;
+					}
+				}
 			}
-			select_pi = true;
 			break;
+		case VK_LEFT:
+			if (false == is_p1_turn)
+			{
+				is_p1_turn = true;
+				if (0 == p2_x)
+				{
+					if (EMPTY == board[DIVIDE_MAX - 1][p2_y])
+						p2_x = DIVIDE_MAX - 1;
+					else if (COLOR == board[DIVIDE_MAX - 1][p2_y])
+					{
+						p2_r = rand() % 256;
+						p2_g = rand() % 256;
+						p2_b = rand() % 256;
+						p2_x = DIVIDE_MAX - 1;
+					}
+					else if (SIZECHANGE == board[DIVIDE_MAX - 1][p2_y])
+					{
+						if (false == p2_shape)
+							p2_shape = true;
+						else
+							p2_shape = false;
+						p2_x = DIVIDE_MAX - 1;
+					}
+				}
+				else
+				{
+					if (EMPTY == board[p2_x - 1][p2_y])
+						--p2_x;
+					else if (COLOR == board[p2_x - 1][p2_y])
+					{
+						p2_r = rand() % 256;
+						p2_g = rand() % 256;
+						p2_b = rand() % 256;
+						--p2_x;
+					}
+					else if (SIZECHANGE == board[p2_x - 1][p2_y])
+					{
+						if (false == p2_shape)
+							p2_shape = true;
+						else
+							p2_shape = false;
+						--p2_x;
+					}
+				}
+			}
+			break;
+		case VK_RIGHT:
+			if (false == is_p1_turn)
+			{
+				is_p1_turn = true;
+				if (DIVIDE_MAX - 1 == p2_x)
+				{
+					if (EMPTY == board[0][p2_y])
+						p2_x = 0;
+					else if (COLOR == board[0][p2_y])
+					{
+						p2_r = rand() % 256;
+						p2_g = rand() % 256;
+						p2_b = rand() % 256;
+						p2_x = 0;
+					}
+					else if (SIZECHANGE == board[0][p2_y])
+					{
+						if (false == p2_shape)
+							p2_shape = true;
+						else
+							p2_shape = false;
+						p2_x = 0;
+					}
+				}
+				else
+				{
+					if (EMPTY == board[p2_x + 1][p2_y])
+						++p2_x;
+					else if (COLOR == board[p2_x + 1][p2_y])
+					{
+						p2_r = rand() % 256;
+						p2_g = rand() % 256;
+						p2_b = rand() % 256;
+						++p2_x;
+					}
+					else if (SIZECHANGE == board[p2_x + 1][p2_y])
+					{
+						if (false == p2_shape)
+							p2_shape = true;
+						else
+							p2_shape = false;
+						++p2_x;
+					}
+				}
+			}
+			break;
+		case 'R':
+		case 'r':
+			for (int i = 0; i < DIVIDE_HEIGHT; ++i)
+			{
+				for (int j = 0; j < DIVIDE_WIDTH; ++j)
+				{
+					board[i][j] = EMPTY;
+				}
+			}
+			p1_x = 0;
+			p1_y = 0;
+			p2_x = DIVIDE_WIDTH - 1;
+			p2_y = DIVIDE_HEIGHT - 1;
+			p1_r = 0;
+			p1_g = 0;
+			p1_b = 0;
+			p2_r = 0;
+			p2_g = 150;
+			p2_b = 150;
+			is_p1_turn = true;
+			p1_shape = false;
+			p2_shape = false;
+			board[p1_x][p1_y] = PLAYER1;
+			board[p2_x][p2_y] = PLAYER2;
+			count_red = 0;
+			count_other = 0;
+			count_size = 0;
+			while (true)
+			{
+				num_red = rand() % 10 + 1;
+				num_other = rand() % 10 + 1;
+				num_size = rand() % 10 + 1;
+
+				if (20 <= num_red + num_other + num_size)
+				{
+					while (true)
+					{
+						int board_x = rand() % DIVIDE_WIDTH;
+						int board_y = rand() % DIVIDE_HEIGHT;
+
+						if (EMPTY == board[board_x][board_y])
+						{
+							board[board_x][board_y] = rand() % 3 + 1;
+
+							if (BLOCK == board[board_x][board_y])
+							{
+								if (num_red != count_red)
+									count_red++;
+								else
+									board[board_x][board_y] = 0;
+							}
+							else if (COLOR == board[board_x][board_y])
+							{
+								if (num_other != count_other)
+									count_other++;
+								else
+									board[board_x][board_y] = 0;
+							}
+							else if (SIZECHANGE == board[board_x][board_y])
+							{
+								if (num_size != count_size)
+									count_size++;
+								else
+									board[board_x][board_y] = 0;
+							}
+
+							if (num_red == count_red && num_other == count_other && num_size == count_size)
+								break;
+						}
+						else
+							continue;
+					}
+				}
+				else
+					continue;
+				break;
+			}
 		}
 	}
 	InvalidateRect(hWnd, NULL, TRUE);
@@ -152,108 +611,84 @@ LRESULT CALLBACK WndProc1(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		switch (wParam)
 		{
 		case VK_UP:
-			s_r = t_sr;
-			s_g = t_sg;
-			s_b = t_sb;
-			select_s = false;
 			break;
 		case VK_LEFT:
-			t_r = t_tr;
-			t_g = t_tg;
-			t_b = t_tb;
-			select_t = false;
 			break;
 		case VK_RIGHT:
-			pe_r = t_per;
-			pe_g = t_peg;
-			pe_b = t_peb;
-			select_pe = false;
 			break;
 		case VK_DOWN:
-			pi_r = t_pir;
-			pi_g = t_pig;
-			pi_b = t_pib;
-			select_pi = false;
 			break;
 		}
 	}
-	InvalidateRect(hWnd, NULL, TRUE);
+	//InvalidateRect(hWnd, NULL, TRUE);
 	break;
 	case WM_PAINT:
 	{
 		hdc = BeginPaint(hWnd, &ps);
 		GetClientRect(hWnd, &C);
 
-
-		Rectangle(hdc, C.left + C.right / 3, C.top + C.bottom / 3, 2 * C.right / 3, 2 * C.bottom / 3);
-
-		hTriBrush = CreateSolidBrush(RGB(t_r, t_g, t_b));
-		oldBrush = (HBRUSH)SelectObject(hdc, hTriBrush);
-
-		POINT Tri[6] = { {C.left + C.right / 6,C.top + C.bottom / 3},
-		{C.left,C.top + 2 * C.bottom / 3},{C.left + C.right / 3,C.top + 2 * C.bottom / 3} };
-		Polygon(hdc, Tri, 3); // 삼각형
-
-		if (true == select_t)
+		for (int i = 0; i < DIVIDE_MAX; ++i)
 		{
-			POINT Tri[6] = { {C.left + C.right / 2,C.top + C.bottom / 3},
-			{C.left + C.right / 3,C.top + 2 * C.bottom / 3},{C.left + 2 * C.right / 3,C.top + 2 * C.bottom / 3} };
-			Polygon(hdc, Tri, 3); // 삼각형
+			MoveToEx(hdc, C.left + i * C.right / 15, C.top, NULL);
+			LineTo(hdc, C.left + i * C.right / 15, C.top + C.bottom);
+			MoveToEx(hdc, C.left, C.top + i * C.bottom / 15, NULL);
+			LineTo(hdc, C.left + C.right, C.top + i * C.bottom / 15);
 		}
 
-		hSandBrush = CreateSolidBrush(RGB(s_r, s_g, s_b));
-		oldBrush = (HBRUSH)SelectObject(hdc, hSandBrush);
-
-		POINT Sand1[6] = { {C.left + C.right / 2,C.top + C.bottom / 6},
-		{C.left + C.right / 3,C.top},{C.left + 2 * C.right / 3,C.top} };
-		Polygon(hdc, Sand1, 3);
-		POINT Sand2[6] = { {C.left + C.right / 2,C.top + C.bottom / 6},
-		{C.left + C.right / 3,C.top + C.bottom / 3},{C.left + 2 * C.right / 3,C.top + C.bottom / 3} };
-		Polygon(hdc, Sand2, 3); // 모래시계
-
-		if (true == select_s)
+		for (int i = 0; i < DIVIDE_WIDTH; ++i)
 		{
-			POINT Sand1[6] = { {C.left + C.right / 2,C.top + C.bottom / 2},
-			{C.left + C.right / 3,C.top + C.bottom / 3},{C.left + 2 * C.right / 3,C.top + C.bottom / 3} };
-			Polygon(hdc, Sand1, 3);
-			POINT Sand2[6] = { {C.left + C.right / 2,C.top + C.bottom / 2},
-			{C.left + C.right / 3,C.top + 2 * C.bottom / 3},{C.left + 2 * C.right / 3,C.top + 2 * C.bottom / 3} };
-			Polygon(hdc, Sand2, 3); // 모래시계
+			for (int j = 0; j < DIVIDE_HEIGHT; ++j)
+			{
+				if (BLOCK == board[i][j]) // 장애물일때
+				{
+					hBrush = CreateSolidBrush(RGB(255, 0, 0));
+					oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+					Rectangle(hdc, C.left + i * C.right / 15, C.top + j * C.bottom / 15,
+						C.left + (i + 1) * C.right / 15, C.top + (j + 1) * C.bottom / 15);
+					SelectObject(hdc, oldBrush);
+					DeleteObject(hBrush);
+				}
+				else if (COLOR == board[i][j]) // 색상 변화
+				{
+					hBrush = CreateSolidBrush(RGB(0, 255, 0));
+					oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+					Rectangle(hdc, C.left + i * C.right / 15, C.top + j * C.bottom / 15,
+						C.left + (i + 1) * C.right / 15, C.top + (j + 1) * C.bottom / 15);
+					SelectObject(hdc, oldBrush);
+					DeleteObject(hBrush);
+				}
+				else if (SIZECHANGE == board[i][j]) // 크기 변화
+				{
+					hBrush = CreateSolidBrush(RGB(0, 0, 255));
+					oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+					RECT rect = { C.left + i * C.right / 15, C.top + j * C.bottom / 15,
+						C.left + (i + 1) * C.right / 15, C.top + (j + 1) * C.bottom / 15 };
+					InflateRect(&rect, -(C.right / 20), -(C.bottom / 20));
+					FillRect(hdc, &rect, hBrush);
+					SelectObject(hdc, oldBrush);
+					DeleteObject(hBrush);
+				}
+			}
 		}
 
-		hPentaBrush = CreateSolidBrush(RGB(pe_r, pe_g, pe_b));
-		oldBrush = (HBRUSH)SelectObject(hdc, hPentaBrush);
+		hBrush = CreateSolidBrush(RGB(p1_r, p1_g, p1_b));
+		oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+		RECT rect_p1 = { C.left + p1_x * C.right / 15, C.top + p1_y * C.bottom / 15,
+			C.left + (p1_x + 1) * C.right / 15, C.top + (p1_y + 1) * C.bottom / 15 };
+		if (true == p1_shape)
+			InflateRect(&rect_p1, -(C.right / 20), -(C.bottom / 20));
+		FillRect(hdc, &rect_p1, hBrush);
+		DeleteObject(hBrush);
 
-		POINT Penta[10] = { {C.left + 5 * C.right / 6,C.top + C.bottom / 3},
-		{C.left + 2 * C.right / 3,C.top + C.bottom / 2},{C.left + 3 * C.right / 4,C.top + 2 * C.bottom / 3},
-		{C.left + 11 * C.right / 12 ,C.top + 2 * C.bottom / 3},{C.left + C.right ,C.top + C.bottom / 2} };
-		Polygon(hdc, Penta, 5); // 모래시계
+		hBrush = CreateSolidBrush(RGB(p2_r, p2_g, p2_b));
+		oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+		RECT rect_p2 = { C.left + p2_x * C.right / 15, C.top + p2_y * C.bottom / 15,
+			C.left + (p2_x + 1) * C.right / 15, C.top + (p2_y + 1) * C.bottom / 15 };
+		if (true == p2_shape)
+			InflateRect(&rect_p2, -(C.right / 20), -(C.bottom / 20));
+		FillRect(hdc, &rect_p2, hBrush);
+		DeleteObject(hBrush);
 
-		if (true == select_pe)
-		{
-			POINT Penta[10] = { {C.left + C.right / 2,C.top + C.bottom / 3},
-			{C.left + C.right / 3,C.top + C.bottom / 2},{C.left + 5 * C.right / 12,C.top + 2 * C.bottom / 3},
-			{C.left + 7 * C.right / 12 ,C.top + 2 * C.bottom / 3},{C.left + 2 * C.right / 3 ,C.top + C.bottom / 2} };
-			Polygon(hdc, Penta, 5); // 모래시계
-		}
-
-		hPieBrush = CreateSolidBrush(RGB(pi_r, pi_g, pi_b));
-		oldBrush = (HBRUSH)SelectObject(hdc, hPieBrush);
-
-		Pie(hdc, C.left + C.right / 3, C.top + 2 * C.bottom / 3, C.left + 2 * C.right / 3, C.top + C.bottom // 파이
-			, C.left + C.right / 2, C.top + 2 * C.bottom / 3, C.left + 2 * C.right / 3, C.top + 5 * C.bottom / 6);
-
-		if (true == select_pi)
-		{
-			Pie(hdc, C.left + C.right / 3, C.top + C.bottom / 3, C.left + 2 * C.right / 3, C.top + 2 * C.bottom / 3 // 파이
-				, C.left + C.right / 2, C.top + C.bottom / 3, C.left + 2 * C.right / 3, C.top + C.bottom / 2);
-		}
-
-		SelectObject(hdc, oldBrush);
-		DeleteObject(hTriBrush);
-		DeleteObject(hSandBrush);
-		DeleteObject(hPentaBrush);
-		DeleteObject(hPieBrush);
 		EndPaint(hWnd, &ps);
 	}
 	break;
