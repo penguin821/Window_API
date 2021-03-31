@@ -276,9 +276,10 @@ LRESULT CALLBACK WndProc1(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	PAINTSTRUCT ps;
 	HDC hdc;
-	static SIZE output_size;
+	RECT C;
+	static SIZE size;
 	TCHAR lpCount[10010];
-	static TCHAR lpOut[WINDOW_HEIGHT / 20][WINDOW_HEIGHT / 10];
+	static TCHAR lpOut[WINDOW_WIDTH / 20][WINDOW_HEIGHT / 10];
 	switch (uMsg)
 	{
 	case WM_CREATE:
@@ -288,6 +289,7 @@ LRESULT CALLBACK WndProc1(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	break;
 	case WM_PAINT:
 		hdc = BeginPaint(hWnd, &ps);
+		GetClientRect(hWnd, &C);
 		SetBkColor(hdc, RGB(rand() % 256, rand() % 256, rand() % 256));
 		SetTextColor(hdc, RGB(rand() % 256, rand() % 256, rand() % 256));
 		//wsprintf(lpCount, L"111");
@@ -310,6 +312,20 @@ LRESULT CALLBACK WndProc1(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			RECT r_rect = { WINDOW_WIDTH / 10 + i, i, (WINDOW_WIDTH / 10 + i) + output_size.cx, i + output_size.cy };
 			DrawText(hdc, lpOut[(i / 20) - 1], _tcslen(lpOut[(i / 20) - 1]), &r_rect, DT_WORDBREAK);
 		}
+
+		for (int i = 0; i < height; i++)
+		{
+			for (int j = 0; j < i; j++)
+			{
+				cout << " ";
+			}
+			for (int j = 0; j < size - (i * 2); j++)
+			{
+				cout << "*";
+			}
+			cout << "\n";
+		}
+
 		EndPaint(hWnd, &ps);
 		break;
 	case WM_DESTROY:
