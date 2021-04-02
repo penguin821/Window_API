@@ -65,16 +65,6 @@ LRESULT CALLBACK WndProc2(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		CreateCaret(hWnd, NULL, 5, 15);
 		ShowCaret(hWnd);
 		break;
-	//case WM_CHAR:
-	//	if (MAX_LENGTH == count)
-	//		break;
-	//	else
-	//	{
-	//		str[count++] = wParam;
-	//		str[count] = '\0';
-	//	}
-	//	InvalidateRect(hWnd, NULL, TRUE); 
-	//	break;
 	case WM_KEYDOWN:
 		hdc = GetDC(hWnd);
 		if (wParam == 'o')

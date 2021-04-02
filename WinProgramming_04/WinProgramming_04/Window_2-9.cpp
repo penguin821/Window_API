@@ -5,6 +5,8 @@
 
 using namespace std;
 
+#define _MSG_BOX(MESSAGE) MessageBox(0, TEXT(MESSAGE), TEXT("Error"), MB_OK);
+
 constexpr int WINDOW_WIDTH = 800;
 constexpr int WINDOW_HEIGHT = 600;
 constexpr int MAX_LENGTH = 21;
@@ -22,6 +24,8 @@ struct shape_info
 {
 	short shape, x1, y1, x2, y2, thick;
 	short r, g, b;
+	short p_r, p_g, p_b;
+	bool isDraw = false;
 };
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdParam, int nCmdShow)
@@ -64,37 +68,83 @@ LRESULT CALLBACK WndProc1(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	PAINTSTRUCT ps;
 	HDC hdc;
 	RECT C;
+	static SIZE input_size;
 	static TCHAR str[MAX_LENGTH+1];
 	static int key_count = 0;
 	static int shape_count;
-	static bool isInput;
+	static bool isFirst;
 	static float numbers[MAX_INPUT];
 	static map<int, shape_info> save_shape;
 	int count_numb = 0;
-	static TCHAR str[MAX_LENGTH + 1];
 	HBRUSH hBrush, oldBrush;
+	HPEN hPen, oldPen;
 
 	switch (uMsg)
 	{
 	case WM_CREATE:
 	{
 		shape_count = 0;
+		isFirst = true;
 	}
 	break;
-	case WM_KEYDOWN:
-		hdc = GetDC(hWnd);
+	case WM_CHAR:
 		if (wParam == 'o')
 		{
 			PostQuitMessage(0);
 		}
+		if (wParam == 'p'|| wParam == 'P')
+		{
+			if (0 < shape_count)
+				shape_count--;
+		}
+		if (wParam == 'n'|| wParam == 'N')
+		{
+			if (false == save_shape[shape_count + 1].isDraw)
+				break;
+			else
+				shape_count++;
+		}
+		if (wParam == 'k'|| wParam == 'K')
+		{
+			save_shape[shape_count].r = rand() % 256;
+			save_shape[shape_count].g = rand() % 256;
+			save_shape[shape_count].b = rand() % 256;
+			save_shape[shape_count].p_r = rand() % 256;
+			save_shape[shape_count].p_g = rand() % 256;
+			save_shape[shape_count].p_b = rand() % 256;
+		}
+		if (wParam == '+' || wParam == '=')
+		{
+			if (save_shape[shape_count].thick <= 10)
+				save_shape[shape_count].thick++;
+			else
+			{
+				save_shape[shape_count].x2++;
+				save_shape[shape_count].y2++;
+			}
+
+		}
+		if (wParam == '-')
+		{
+			if (save_shape[shape_count].thick > 1)
+				save_shape[shape_count].thick--;
+			else
+			{
+				save_shape[shape_count].x2--;
+				save_shape[shape_count].y2--;
+			}
+		}
+		else
+			break;
+	case WM_KEYDOWN:
 		if (wParam == VK_BACK)
 		{
-			if (key_count == 0)
+			if (0 == key_count)
 				break;
 			else
 				str[--key_count] = '\0';
 		}
-		else if (wParam == VK_RETURN)
+		if (wParam == VK_RETURN)
 		{
 			str[key_count] = '\n';
 			for (int i = 0; i < key_count; i++)
@@ -131,11 +181,13 @@ LRESULT CALLBACK WndProc1(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					str[i] = '\0';
 				}
 				key_count = 0;
-				isInput = false;
 			}
 			else // 정상 입력시 처리, numbers[2] 단수
 			{
 				str[key_count] = '\0';
+
+				if (false == isFirst)
+					shape_count++;
 
 				save_shape[shape_count].shape = numbers[0];
 				save_shape[shape_count].x1 = numbers[1];
@@ -143,9 +195,35 @@ LRESULT CALLBACK WndProc1(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				save_shape[shape_count].x2 = numbers[3];
 				save_shape[shape_count].y2 = numbers[4];
 				save_shape[shape_count].thick = numbers[5];
-				shape_count++;
-				isInput = true;
+				save_shape[shape_count].r = rand() % 256;
+				save_shape[shape_count].g = rand() % 256;
+				save_shape[shape_count].b = rand() % 256;
+				save_shape[shape_count].p_r = rand() % 256;
+				save_shape[shape_count].p_g = rand() % 256;
+				save_shape[shape_count].p_b = rand() % 256;
+				save_shape[shape_count].isDraw = true;
+				isFirst = false;
 			}
+		}
+		if (wParam == VK_UP)
+		{
+			save_shape[shape_count].y1 -= 3;
+			save_shape[shape_count].y2 -= 3;
+		}
+		if (wParam == VK_DOWN)
+		{
+			save_shape[shape_count].y1 += 3;
+			save_shape[shape_count].y2 += 3;
+		}
+		if (wParam == VK_LEFT)
+		{
+			save_shape[shape_count].x1 -= 3;
+			save_shape[shape_count].x2 -= 3;
+		}
+		if (wParam == VK_RIGHT)
+		{
+			save_shape[shape_count].x1 += 3;
+			save_shape[shape_count].x2 += 3;
 		}
 		else
 		{
@@ -153,14 +231,17 @@ LRESULT CALLBACK WndProc1(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				break;
 			else
 			{
-				str[key_count++] = wParam;
-				str[key_count] = '\0';
+				if ((48 <= wParam && 57 >= wParam) || 32 == wParam)
+				{
+					str[key_count++] = wParam;
+					str[key_count] = '\0';
+				}
+				else
+					MessageBox(0, L"Input shape info first!", L"Error", MB_OK);
 			}
 		}
-		TextOut(hdc, 0, 0, str, lstrlen(str));
-		ReleaseDC(hWnd, hdc);
 		InvalidateRect(hWnd, NULL, TRUE);
-	break;
+		break;
 	case WM_KEYUP:
 	{
 		switch (wParam)
@@ -182,37 +263,55 @@ LRESULT CALLBACK WndProc1(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		hdc = BeginPaint(hWnd, &ps);
 		GetClientRect(hWnd, &C);
 
+		GetTextExtentPoint32(hdc, str, lstrlen(str), &input_size);
+		TextOut(hdc, 0, 0, str, lstrlen(str));
+		SetCaretPos(input_size.cx, 0);
+
 		shape_info& s = save_shape[shape_count];
+		hBrush = CreateSolidBrush(RGB(0, 0, 0));
+		oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+		hPen = CreatePen(PS_DOT, s.thick, RGB(0, 0, 0));
+		oldPen = (HPEN)SelectObject(hdc, hPen);
 
 		if (1 == s.shape) // 직선
 		{
-			hBrush = CreateSolidBrush(RGB(t_r, t_g, t_b));
+			hBrush = CreateSolidBrush(RGB(s.r, s.g, s.b));
 			oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+			hPen = CreatePen(PS_DOT, s.thick, RGB(s.p_r, s.p_g, s.p_b));
+			oldPen = (HPEN)SelectObject(hdc, hPen);
 			MoveToEx(hdc, s.x1, s.y1, NULL);
 			LineTo(hdc, s.x2, s.y2);
 		}
 		if (2 == s.shape) // 삼각형
 		{
-			hBrush = CreateSolidBrush(RGB(t_r, t_g, t_b));
+			hBrush = CreateSolidBrush(RGB(s.r, s.g, s.b));
 			oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+			hPen = CreatePen(PS_DOT, s.thick, RGB(s.p_r, s.p_g, s.p_b));
+			oldPen = (HPEN)SelectObject(hdc, hPen);
 			POINT Tri[6] = { {(s.x1 + s.x2) / 2 ,s.y1},{s.x1,s.y2},{s.x2,s.y2} };
 			Polygon(hdc, Tri, 3); // 삼각형
 		}
 		if (3 == s.shape) // 사각형
 		{
-			hBrush = CreateSolidBrush(RGB(t_r, t_g, t_b));
+			hBrush = CreateSolidBrush(RGB(s.r, s.g, s.b));
 			oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+			hPen = CreatePen(PS_DOT, s.thick, RGB(s.p_r, s.p_g, s.p_b));
+			oldPen = (HPEN)SelectObject(hdc, hPen);
 			Rectangle(hdc, s.x1, s.y1, s.x2, s.y2);
 		}
 		if (4 == save_shape[shape_count].shape) // 원
 		{
-			hBrush = CreateSolidBrush(RGB(t_r, t_g, t_b));
+			hBrush = CreateSolidBrush(RGB(s.r, s.g, s.b));
 			oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+			hPen = CreatePen(PS_DOT, s.thick, RGB(s.p_r, s.p_g, s.p_b));
+			oldPen = (HPEN)SelectObject(hdc, hPen);
 			Ellipse(hdc, s.x1, s.y1, s.x2, s.y2);
 		}
 
 		SelectObject(hdc, oldBrush);
 		DeleteObject(hBrush);
+		SelectObject(hdc, oldPen);
+		DeleteObject(hPen);
 		EndPaint(hWnd, &ps);
 	}
 	break;
