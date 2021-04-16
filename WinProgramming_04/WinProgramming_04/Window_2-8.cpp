@@ -7,7 +7,7 @@ constexpr int WINDOW_HEIGHT = 800;
 
 constexpr int DIVIDE_WIDTH = 15;
 constexpr int DIVIDE_HEIGHT = 15;
-constexpr int DIVIDE_MAX = 15;
+constexpr int DIVIDE_NOW = 15;
 
 constexpr short EMPTY = 0;
 constexpr short BLOCK = 1;
@@ -156,22 +156,22 @@ LRESULT CALLBACK WndProc1(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				is_p1_turn = false;
 				if (0 == p1_y)
 				{
-					if (EMPTY == board[p1_x][DIVIDE_MAX - 1])
-						p1_y = DIVIDE_MAX - 1;
-					else if (COLOR == board[p1_x][DIVIDE_MAX - 1])
+					if (EMPTY == board[p1_x][DIVIDE_NOW - 1])
+						p1_y = DIVIDE_NOW - 1;
+					else if (COLOR == board[p1_x][DIVIDE_NOW - 1])
 					{
 						p1_r = rand() % 256;
 						p1_g = rand() % 256;
 						p1_b = rand() % 256;
-						p1_y = DIVIDE_MAX - 1;
+						p1_y = DIVIDE_NOW - 1;
 					}
-					else if (SIZECHANGE == board[p1_x][DIVIDE_MAX - 1])
+					else if (SIZECHANGE == board[p1_x][DIVIDE_NOW - 1])
 					{
 						if (false == p1_shape)
 							p1_shape = true;
 						else
 							p1_shape = false;
-						p1_y = DIVIDE_MAX - 1;
+						p1_y = DIVIDE_NOW - 1;
 					}
 				}
 				else
@@ -201,7 +201,7 @@ LRESULT CALLBACK WndProc1(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (true == is_p1_turn)
 			{
 				is_p1_turn = false;
-				if (DIVIDE_MAX - 1 == p1_y)
+				if (DIVIDE_NOW - 1 == p1_y)
 				{
 					if (EMPTY == board[p1_x][0])
 						p1_y = 0;
@@ -250,22 +250,22 @@ LRESULT CALLBACK WndProc1(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				is_p1_turn = false;
 				if (0 == p1_x)
 				{
-					if (EMPTY == board[DIVIDE_MAX - 1][p1_y])
-						p1_x = DIVIDE_MAX - 1;
-					else if (COLOR == board[DIVIDE_MAX - 1][p1_y])
+					if (EMPTY == board[DIVIDE_NOW - 1][p1_y])
+						p1_x = DIVIDE_NOW - 1;
+					else if (COLOR == board[DIVIDE_NOW - 1][p1_y])
 					{
 						p1_r = rand() % 256;
 						p1_g = rand() % 256;
 						p1_b = rand() % 256;
-						p1_x = DIVIDE_MAX - 1;
+						p1_x = DIVIDE_NOW - 1;
 					}
-					else if (SIZECHANGE == board[DIVIDE_MAX - 1][p1_y])
+					else if (SIZECHANGE == board[DIVIDE_NOW - 1][p1_y])
 					{
 						if (false == p1_shape)
 							p1_shape = true;
 						else
 							p1_shape = false;
-						p1_x = DIVIDE_MAX - 1;
+						p1_x = DIVIDE_NOW - 1;
 					}
 				}
 				else
@@ -295,7 +295,7 @@ LRESULT CALLBACK WndProc1(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (true == is_p1_turn)
 			{
 				is_p1_turn = false;
-				if (DIVIDE_MAX - 1 == p1_x)
+				if (DIVIDE_NOW - 1 == p1_x)
 				{
 					if (EMPTY == board[0][p1_y])
 						p1_x = 0;
@@ -347,22 +347,22 @@ LRESULT CALLBACK WndProc1(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				is_p1_turn = true;
 				if (0 == p2_y)
 				{
-					if (EMPTY == board[p2_x][DIVIDE_MAX - 1])
-						p2_y = DIVIDE_MAX - 1;
-					else if (COLOR == board[p2_x][DIVIDE_MAX - 1])
+					if (EMPTY == board[p2_x][DIVIDE_NOW - 1])
+						p2_y = DIVIDE_NOW - 1;
+					else if (COLOR == board[p2_x][DIVIDE_NOW - 1])
 					{
 						p2_r = rand() % 256;
 						p2_g = rand() % 256;
 						p2_b = rand() % 256;
-						p2_y = DIVIDE_MAX - 1;
+						p2_y = DIVIDE_NOW - 1;
 					}
-					else if (SIZECHANGE == board[p2_x][DIVIDE_MAX - 1])
+					else if (SIZECHANGE == board[p2_x][DIVIDE_NOW - 1])
 					{
 						if (false == p1_shape)
 							p2_shape = true;
 						else
 							p2_shape = false;
-						p2_y = DIVIDE_MAX - 1;
+						p2_y = DIVIDE_NOW - 1;
 					}
 				}
 				else
@@ -391,7 +391,7 @@ LRESULT CALLBACK WndProc1(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (false == is_p1_turn)
 			{
 				is_p1_turn = true;
-				if (DIVIDE_MAX - 1 == p2_y)
+				if (DIVIDE_NOW - 1 == p2_y)
 				{
 					if (EMPTY == board[p2_x][0])
 						p2_y = 0;
@@ -439,22 +439,22 @@ LRESULT CALLBACK WndProc1(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				is_p1_turn = true;
 				if (0 == p2_x)
 				{
-					if (EMPTY == board[DIVIDE_MAX - 1][p2_y])
-						p2_x = DIVIDE_MAX - 1;
-					else if (COLOR == board[DIVIDE_MAX - 1][p2_y])
+					if (EMPTY == board[DIVIDE_NOW - 1][p2_y])
+						p2_x = DIVIDE_NOW - 1;
+					else if (COLOR == board[DIVIDE_NOW - 1][p2_y])
 					{
 						p2_r = rand() % 256;
 						p2_g = rand() % 256;
 						p2_b = rand() % 256;
-						p2_x = DIVIDE_MAX - 1;
+						p2_x = DIVIDE_NOW - 1;
 					}
-					else if (SIZECHANGE == board[DIVIDE_MAX - 1][p2_y])
+					else if (SIZECHANGE == board[DIVIDE_NOW - 1][p2_y])
 					{
 						if (false == p2_shape)
 							p2_shape = true;
 						else
 							p2_shape = false;
-						p2_x = DIVIDE_MAX - 1;
+						p2_x = DIVIDE_NOW - 1;
 					}
 				}
 				else
@@ -483,7 +483,7 @@ LRESULT CALLBACK WndProc1(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (false == is_p1_turn)
 			{
 				is_p1_turn = true;
-				if (DIVIDE_MAX - 1 == p2_x)
+				if (DIVIDE_NOW - 1 == p2_x)
 				{
 					if (EMPTY == board[0][p2_y])
 						p2_x = 0;
@@ -627,7 +627,7 @@ LRESULT CALLBACK WndProc1(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		hdc = BeginPaint(hWnd, &ps);
 		GetClientRect(hWnd, &C);
 
-		for (int i = 0; i < DIVIDE_MAX; ++i)
+		for (int i = 0; i < DIVIDE_NOW; ++i)
 		{
 			MoveToEx(hdc, C.left + i * C.right / 15, C.top, NULL);
 			LineTo(hdc, C.left + i * C.right / 15, C.top + C.bottom);

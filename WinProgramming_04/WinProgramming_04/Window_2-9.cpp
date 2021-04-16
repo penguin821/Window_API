@@ -174,13 +174,17 @@ LRESULT CALLBACK WndProc1(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					}
 				}
 			}
-			if ((MAX_INPUT != count_numb) || (numbers[0] > 5) || (numbers[0] <= 0))
+			if ((MAX_INPUT != count_numb) || (numbers[0] > 5) || (numbers[0] <= 0) || 10 == shape_count)
 			{
 				for (int i = 0; i < key_count; i++)
 				{
 					str[i] = '\0';
 				}
 				key_count = 0;
+				if (10 == shape_count)
+					MessageBox(0, L"Full !", L"Error", MB_OK);
+				else
+					MessageBox(0, L"Input shape info first !", L"Error", MB_OK);
 			}
 			else // 정상 입력시 처리, numbers[2] 단수
 			{
@@ -236,8 +240,6 @@ LRESULT CALLBACK WndProc1(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					str[key_count++] = wParam;
 					str[key_count] = '\0';
 				}
-				else
-					MessageBox(0, L"Input shape info first!", L"Error", MB_OK);
 			}
 		}
 		InvalidateRect(hWnd, NULL, TRUE);
