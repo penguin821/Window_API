@@ -1,0 +1,94 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "winres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 한국어(대한민국) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)
+LANGUAGE LANG_KOREAN, SUBLANG_DEFAULT
+#pragma code_page(949)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""winres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU1 MENU
+BEGIN
+    POPUP "Game"
+    BEGIN
+        MENUITEM "Start",                       ID_GAME_START
+        MENUITEM "End",                         ID_GAME_END
+    END
+    POPUP "Speed"
+    BEGIN
+        MENUITEM "Accelerate",                  ID_SPEED_ACCELERATE
+        MENUITEM "Slow Down",                   ID_SPEED_SLOWDOWN
+    END
+    POPUP "Direction"
+    BEGIN
+        MENUITEM "Up, Down",                    ID_DIRECTION_UP
+        MENUITEM "Left, Right",                 ID_DIRECTION_LEFT
+        MENUITEM "All",                         ID_DIRECTION_ALL
+    END
+    POPUP "Traffic Light"
+    BEGIN
+        MENUITEM "Red",                         ID_TRAFFICLIGHT_RED
+        MENUITEM "Blue",                        ID_TRAFFICLIGHT_BLUE
+        MENUITEM "Yellow",                      ID_TRAFFICLIGHT_YELLOW
+        MENUITEM "Auto",                        ID_TRAFFICLIGHT_AUTO
+    END
+END
+
+#endif    // 한국어(대한민국) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
